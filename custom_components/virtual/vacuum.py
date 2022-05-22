@@ -12,7 +12,7 @@ import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.vacuum import (
-    SUPPORT_DIRECTION,
+    #SUPPORT_DIRECTION,
     #SUPPORT_OSCILLATE,
     SUPPORT_SET_SPEED,
     VacuumEntity,
@@ -88,9 +88,9 @@ class VirtualVacuum(vacuumEntity):
         #if config.get(CONF_OSCILLATE, False):
         #    self._supported_features |= SUPPORT_OSCILLATE
         #    self._oscillating = False
-        if config.get(CONF_DIRECTION, False):
-            self._supported_features |= SUPPORT_DIRECTION
-            self._direction = "forward"
+        #if config.get(CONF_DIRECTION, False):
+        #    self._supported_features |= SUPPORT_DIRECTION
+        #    self._direction = "forward"
         self._available = config.get(CONF_INITIAL_AVAILABILITY)
 
         _LOGGER.info('VirtualVacuum: {} created'.format(self._name))

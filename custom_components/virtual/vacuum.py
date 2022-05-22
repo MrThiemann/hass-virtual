@@ -15,7 +15,7 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.components.vacuum import (
     #SUPPORT_DIRECTION,
     #SUPPORT_OSCILLATE,
-    SUPPORT_SET_SPEED,
+    SUPPORT_FAN_SPEED,
     VacuumEntity,
 )
 from homeassistant.const import STATE_OFF
@@ -85,7 +85,7 @@ class VirtualVacuum(vacuumEntity):
 
         self._supported_features = 0
         if self._speed_count > 0:
-            self._supported_features |= SUPPORT_SET_SPEED
+            self._supported_features |= SUPPORT_FAN_SPEED
         #if config.get(CONF_OSCILLATE, False):
         #    self._supported_features |= SUPPORT_OSCILLATE
         #    self._oscillating = False

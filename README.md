@@ -1,5 +1,5 @@
 # hass-virtual
-### Virtual Components for Home Assistant
+### Virtual Components for Home Assistant KT
 Virtual components for testing Home Assistant systems.
 
 ## Table Of Contents

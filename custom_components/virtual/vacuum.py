@@ -2,6 +2,7 @@
 This component provides support for a virtual vacuum.
 
 Borrowed heavily from components/demo/vacuum.py
+
 """
 
 from __future__ import annotations

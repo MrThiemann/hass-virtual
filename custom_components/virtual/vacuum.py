@@ -1,5 +1,6 @@
 """
 This component provides support for a virtual vacuum.
+
 Borrowed heavily from components/demo/vacuum.py
 """
 
@@ -11,25 +12,10 @@ import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.vacuum import (
-    ATTR_CLEANED_AREA,
-    DOMAIN,
-    PLATFORM_SCHEMA,
-    STATE_CLEANING,
-    STATE_DOCKED,
-    STATE_ERROR,
-    STATE_IDLE,
-    STATE_PAUSED,
-    STATE_RETURNING,
-    SUPPORT_BATTERY,
-    SUPPORT_FAN_SPEED,
-    SUPPORT_LOCATE,
-    SUPPORT_PAUSE,
-    SUPPORT_RETURN_HOME,
-    SUPPORT_SEND_COMMAND,
-    SUPPORT_START,
-    SUPPORT_STATE,
-    SUPPORT_STOP,
-    StateVacuumEntity,
+    SUPPORT_DIRECTION,
+    #SUPPORT_OSCILLATE,
+    SUPPORT_SET_SPEED,
+    VacuumEntity,
 )
 from homeassistant.const import STATE_OFF
 from homeassistant.helpers.config_validation import (PLATFORM_SCHEMA)
@@ -37,16 +23,10 @@ from homeassistant.helpers.config_validation import (PLATFORM_SCHEMA)
 _LOGGER = logging.getLogger(__name__)
 
 CONF_NAME = "name"
-CONF_BATTERY = "battery"
-CONF_FAN_SPEED = "speed"
-CONF_LOCATE = "locate"
-CONF_PAUSE = "pause"
-CONF_RETURN_HOME = "return"
-CONF_SEND_COMMAND = "command"
-CONF_START = "start"
-CONF_STATE = "state"
-CONF_STOP = "stop"
-
+CONF_SPEED = "speed"
+CONF_SPEED_COUNT = "speed_count"
+#CONF_OSCILLATE = "oscillate"
+CONF_DIRECTION = "direction"
 CONF_MODES = "modes"
 CONF_INITIAL_AVAILABILITY = "initial_availability"
 DEFAULT_INITIAL_AVAILABILITY = True
@@ -58,15 +38,10 @@ DEFAULT_INITIAL_AVAILABILITY = True
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_NAME): cv.string,
-    vol.Optional(CONF_BATTERY, default=False): cv.boolean,
-    vol.Optional(CONF_FAN_SPEED, default=0): cv.positive_int,
-    vol.Optional(CONF_LOCATE, default=False): cv.boolean,
-    vol.Optional(CONF_PAUSE, default=False): cv.boolean,
-    vol.Optional(CONF_RETURN_HOME, default=False): cv.boolean,
-    vol.Optional(CONF_SEND_COMMAND, default=False): cv.boolean,
-    vol.Optional(CONF_START, default=False): cv.boolean,
-    vol.Optional(CONF_STATE, default=False): cv.boolean,
-    vol.Optional(CONF_STOP, default=False): cv.boolean,
+    vol.Optional(CONF_SPEED, default=False): cv.boolean,
+    vol.Optional(CONF_SPEED_COUNT, default=0): cv.positive_int,
+    #vol.Optional(CONF_OSCILLATE, default=False): cv.boolean,
+    vol.Optional(CONF_DIRECTION, default=False): cv.boolean,
     vol.Optional(CONF_MODES, default=[]): vol.All(cv.ensure_list, [cv.string]),
     vol.Optional(CONF_INITIAL_AVAILABILITY, default=DEFAULT_INITIAL_AVAILABILITY): cv.boolean,
 })
@@ -78,7 +53,7 @@ async def async_setup_platform(_hass, config, async_add_entities, _discovery_inf
     async_add_entities(vacuums, True)
 
 
-class VirtualFan(VacuumEntity):
+class VirtualVacuum(vacuumEntity):
     """A demonstration vacuum component."""
 
     def __init__(self, config):
@@ -95,12 +70,12 @@ class VirtualFan(VacuumEntity):
         self._preset_modes = config.get(CONF_MODES, [])
 
         # Try for speed count then speed. 
-        #  - fan_speed; number of speeds we support
+        #  - speed_count; number of speeds we support
         #  - speed == True; 3 speeds
         #  - speed == False; no speeds
-        self._fan_speed = config.get(CONF_fan_speed)
+        self._speed_count = config.get(CONF_SPEED_COUNT)
         if config.get(CONF_SPEED, False):
-            self._fan_speed = 3
+            self._speed_count = 3
 
         self._percentage = None
         self._preset_mode = None
@@ -108,11 +83,11 @@ class VirtualFan(VacuumEntity):
         self._direction = None
 
         self._supported_features = 0
-        if self._fan_speed > 0:
+        if self._speed_count > 0:
             self._supported_features |= SUPPORT_SET_SPEED
-        if config.get(CONF_OSCILLATE, False):
-            self._supported_features |= SUPPORT_OSCILLATE
-            self._oscillating = False
+        #if config.get(CONF_OSCILLATE, False):
+        #    self._supported_features |= SUPPORT_OSCILLATE
+        #    self._oscillating = False
         if config.get(CONF_DIRECTION, False):
             self._supported_features |= SUPPORT_DIRECTION
             self._direction = "forward"
@@ -135,7 +110,7 @@ class VirtualFan(VacuumEntity):
 
     @property
     def should_poll(self):
-        """No polling needed for a demo Vacuum."""
+        """No polling needed for a demo vacuum."""
         return False
 
     @property
@@ -144,9 +119,9 @@ class VirtualFan(VacuumEntity):
         return self._percentage
 
     @property
-    def fan_speed(self) -> int:
+    def speed_count(self) -> int:
         """Return the number of speeds the vacuum supports."""
-        return self._fan_speed
+        return self._speed_count
 
     def set_percentage(self, percentage: int) -> None:
         """Set the speed of the vacuum, as a percentage."""
@@ -207,20 +182,20 @@ class VirtualFan(VacuumEntity):
         self._direction = direction
         self.schedule_update_ha_state()
 
-    def oscillate(self, oscillating: bool) -> None:
-        """Set oscillation."""
-        self._oscillating = oscillating
-        self.schedule_update_ha_state()
+    #def oscillate(self, oscillating: bool) -> None:
+    #    """Set oscillation."""
+    #    self._oscillating = oscillating
+    #    self.schedule_update_ha_state()
 
     @property
     def current_direction(self) -> str:
-        """Vacuum direction."""
+        """vacuum direction."""
         return self._direction
 
-    @property
-    def oscillating(self) -> bool:
-        """Oscillating."""
-        return self._oscillating
+    #@property
+    #def oscillating(self) -> bool:
+    #    """Oscillating."""
+    #    return self._oscillating
 
     @property
     def supported_features(self) -> int:
